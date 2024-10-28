@@ -10,7 +10,8 @@ conn = psycopg2.connect(dbname="postgres", user="postgres", password="postgres",
 @router.get("/users/{user_id}")
 async def read_user(user_id: int):
     cursor = conn.cursor()
-    info = cursor.execute("SELECT * FROM users WHERE user_id = %s", user_id)
+    cursor.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
+    info = cursor.fetchone()
     conn.commit()
     return JSONResponse(content=json.dumps(info))
 
@@ -18,7 +19,8 @@ async def read_user(user_id: int):
 @router.get("/users")
 async def read_users():
     cursor = conn.cursor()
-    info = cursor.execute("SELECT * FROM users")
+    cursor.execute("SELECT * FROM users")
+    info = cursor.fetchall()
     conn.commit()
     return JSONResponse(content=json.dumps(info))
 
@@ -48,7 +50,7 @@ async def add_user(name: str, email: str, password: str, address: str, one_piece
 async def remove_user(user_id: int):
     try:
         cursor = conn.cursor()
-        cursor.execute("DELETE FROM users WHERE user_id = %s", user_id)
+        cursor.execute("DELETE FROM users WHERE user_id = %s", (user_id,))
         conn.commit()
     except:
         return JSONResponse(content=json.dumps({"message": "User not found"}))

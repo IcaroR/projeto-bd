@@ -12,7 +12,8 @@ conn = psycopg2.connect(dbname="postgres", user="postgres", password="postgres",
 async def read_products():
     try:
         cursor = conn.cursor()
-        info = cursor.execute("SELECT * FROM products")
+        cursor.execute("SELECT * FROM products")
+        info = cursor.fetchall()
         conn.commit()
     except:
         return JSONResponse(content=json.dumps({"message": "Error retrieving products"}))
@@ -23,9 +24,9 @@ async def read_products():
 async def add_product(name: str, price: float, quantity: int, seller_id: int, fab_at: str):
     try:
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO products (name, price, quantity, seller_id, fab_at) VALUES (%s, %s, %s, %s)", (name, price, quantity, seller_id, fab_at))
+        cursor.execute("INSERT INTO products (name, price, quantity, seller_id, fab_at) VALUES (%s, %s, %s, %s, %s)", (name, price, quantity, seller_id, fab_at))
         conn.commit()
-    except:
+    except Exception as e:
         return JSONResponse(content=json.dumps({"message": "Product already exists"}))
     return JSONResponse(content=json.dumps({"message": "Product added"}))
 

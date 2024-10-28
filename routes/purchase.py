@@ -15,13 +15,13 @@ async def add_purchase(user_id: int, payment_method: str):
         conn.autocommit = False
 
         # Pegando todos os itens do carrinho
-        cursor.execute("SELECT product_id, quantity, price FROM carts WHERE user_id = %s", (user_id,))
+        cursor.execute("SELECT item_id, quantity FROM cart WHERE user_id = %s", (user_id,))
         carts = cursor.fetchall()
         if not carts:
             raise HTTPException(status_code=400, detail="Cart not found")
         
         for cart in carts:
-            product_id, requested_quantity, price = cart
+            product_id, requested_quantity = cart
 
             # Pegando todos os vendedores do produto
             cursor.execute("""
@@ -64,7 +64,6 @@ async def add_purchase(user_id: int, payment_method: str):
                         WHERE product_id = %s AND seller_id = %s
                     """, (product_id, seller_id))
                     remaining -= seller_quantity
-
         total_price = sum(cart[1] * cart[2] for cart in carts)
         # Adicionando a compra
         cursor.execute("""
