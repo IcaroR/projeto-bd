@@ -104,6 +104,7 @@ GROUP BY
 ORDER BY 
     count DESC;
 
+
 -- Create the top users by spending view
 CREATE VIEW top_users_by_spending AS
 SELECT 
